@@ -3,79 +3,188 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chat de la Banda 🚀</title>
+<title>WhatsApp Banda Pro 🚀</title>
 
 <style>
-body{
-  margin:0;
-  font-family:sans-serif;
-  background:#0b141a;
-  color:#e9edef;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-}
-header{
-  background:#202c33;
-  padding:12px;
-  text-align:center;
-  font-weight:bold;
-}
-#msgs{
-  flex:1;
-  overflow-y:auto;
-  padding:10px;
-}
-.msg{
-  background:#202c33;
-  padding:8px 10px;
-  margin:6px 0;
-  border-radius:10px;
-  max-width:80%;
-}
-.mio{
-  background:#005c4b;
-  margin-left:auto;
-}
-footer{
-  display:flex;
-  gap:6px;
-  padding:10px;
-  background:#202c33;
-}
-input{
-  flex:1;
-  padding:10px;
-  border-radius:20px;
-  border:none;
-  outline:none;
-}
-button{
-  border:none;
-  background:#00a884;
-  color:white;
-  width:40px;
-  border-radius:50%;
-  font-size:18px;
-}
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #0b141a;
+    background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Pantalla de Inicio - FORZADA */
+  #login-screen {
+    position: fixed;
+    inset: 0;
+    background: #111b21;
+    display: flex; /* Se cambia a 'none' por JS si ya hay nombre */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .login-card {
+    background: #202c33;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    width: 85%;
+    max-width: 320px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+  .login-card input {
+    width: 90%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    margin: 20px 0;
+    background: #2a3942;
+    color: white;
+    font-size: 16px;
+  }
+  .login-card button {
+    background: #00a884;
+    color: #111b21;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  /* Header y Admin Button */
+  header {
+    background: #202c33;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #e9edef;
+    z-index: 10;
+  }
+  .admin-btn {
+    background: #2a3942;
+    border: 1px solid #00a884;
+    color: #00a884;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  #admin-panel {
+    display: none;
+    background: #8d1a1a;
+    padding: 8px;
+    text-align: center;
+    color: white;
+    font-size: 12px;
+  }
+
+  /* Contenedor de Mensajes */
+  #msgs {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .msg {
+    padding: 8px 12px;
+    border-radius: 10px;
+    max-width: 80%;
+    color: white;
+    position: relative;
+    font-size: 15px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+  .msg b { display: block; font-size: 11px; color: #ffd07a; margin-bottom: 2px; }
+  .recibido { background: #202c33; align-self: flex-start; }
+  .mio { background: #005c4b; align-self: flex-end; }
+
+  /* Burbuja del BOT Admin */
+  .bot-msg {
+    background: rgba(30, 190, 165, 0.1);
+    border: 1px solid #00a884;
+    color: #00a884;
+    align-self: center;
+    text-align: center;
+    font-size: 13px;
+    border-radius: 20px;
+    padding: 5px 20px;
+    margin: 10px 0;
+  }
+
+  footer {
+    background: #202c33;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #txt {
+    flex: 1;
+    background: #2a3942;
+    border: none;
+    padding: 12px 15px;
+    border-radius: 25px;
+    color: white;
+    outline: none;
+  }
+  #btn-send {
+    background: #00a884;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    font-size: 20px;
+  }
 </style>
 </head>
 
 <body>
 
-<header>Chat de la Banda 🚀</header>
+<div id="login-screen">
+  <div class="login-card">
+    <h2 style="color:#00a884; margin:0;">WhatsApp Banda</h2>
+    <p style="color:#8696a0; font-size:14px;">Ingresa para comenzar</p>
+    <input type="text" id="user-name" placeholder="Tu apodo o nombre...">
+    <button onclick="ingresar()">ENTRAR AL CHAT</button>
+  </div>
+</div>
+
+<header>
+  <div style="display:flex; align-items:center; gap:10px;">
+    <div style="width:35px; height:35px; background:#6a7175; border-radius:50%; display:flex; align-items:center; justify-content:center;">👥</div>
+    <div style="font-weight:bold;">La Banda 🚀</div>
+  </div>
+  <button class="admin-btn" onclick="checkAdmin()">Panel Admin</button>
+</header>
+
+<div id="admin-panel">
+  MODO ADMIN ACTIVO | <button onclick="borrarTodo()" style="background:white; border:none; padding:2px 5px; cursor:pointer;">Borrar Historial</button>
+</div>
 
 <div id="msgs"></div>
 
 <footer>
-  <input id="txt" placeholder="Escribí algo">
-  <button onclick="send()">➤</button>
+  <input id="txt" placeholder="Escribe un mensaje..." autocomplete="off">
+  <button id="btn-send" onclick="send()">➤</button>
 </footer>
 
-<!-- 🔥 FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, push, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyABaTv7yjGsgIu2A6mj6arml2IHGljt_H4",
@@ -91,25 +200,66 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const mensajesRef = ref(db, "mensajes");
 
-const nombre = prompt("Tu nombre") || "Anon";
+// Lógica de Persistencia y Pantalla
+let nombre = localStorage.getItem("chat_user_name");
+
+if (nombre) {
+    document.getElementById("login-screen").style.display = "none";
+}
+
+window.ingresar = () => {
+    const input = document.getElementById("user-name");
+    if (input.value.trim()) {
+        nombre = input.value.trim();
+        localStorage.setItem("chat_user_name", nombre);
+        document.getElementById("login-screen").style.display = "none";
+    }
+};
+
+// Lógica Admin
+window.checkAdmin = () => {
+    const code = prompt("Código Admin:");
+    if (code === "1234") {
+        document.getElementById("admin-panel").style.display = "block";
+        push(mensajesRef, { user: "BOT", text: `⚠️ ${nombre} ha activado el MODO ADMIN`, tipo: "bot" });
+    } else {
+        alert("Código incorrecto");
+    }
+};
+
+window.borrarTodo = () => {
+    if(confirm("¿Borrar todos los mensajes?")) remove(mensajesRef);
+};
+
+// Cargar Mensajes (Historial + Nuevos)
 const cont = document.getElementById("msgs");
 
-onChildAdded(mensajesRef, snap => {
-  const d = snap.val();
-  const div = document.createElement("div");
-  div.className = "msg" + (d.user === nombre ? " mio" : "");
-  div.innerHTML = "<b>"+d.user+"</b><br>"+d.text;
-  cont.appendChild(div);
-  cont.scrollTop = cont.scrollHeight;
+onChildAdded(mensajesRef, (snap) => {
+    const d = snap.val();
+    const div = document.createElement("div");
+
+    if (d.tipo === "bot") {
+        div.className = "bot-msg";
+        div.innerHTML = d.text;
+    } else {
+        const esMio = d.user === nombre;
+        div.className = "msg " + (esMio ? "mio" : "recibido");
+        div.innerHTML = `<b>${d.user}</b>${d.text}`;
+    }
+
+    cont.appendChild(div);
+    cont.scrollTop = cont.scrollHeight;
 });
 
 window.send = () => {
-  const i = document.getElementById("txt");
-  if(!i.value.trim()) return;
-  push(mensajesRef, { user: nombre, text: i.value });
-  i.value = "";
+    const i = document.getElementById("txt");
+    if (!i.value.trim() || !nombre) return;
+    push(mensajesRef, { user: nombre, text: i.value });
+    i.value = "";
 };
-</script>
 
+document.getElementById("txt").addEventListener("keypress", (e) => { if(e.key === "Enter") send(); });
+
+</script>
 </body>
 </html>
