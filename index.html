@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat de Amigos</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #0b141a; color: white; margin: 0; padding: 20px; }
+        #login, #chat { max-width: 500px; margin: auto; background: #111b21; padding: 20px; border-radius: 15px; }
+        .hidden { display: none; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; background: #2a3942; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #00a884; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
+        #messages { height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; padding: 10px; }
+        .msg { background: #202c33; padding: 10px; border-radius: 10px; width: fit-content; max-width: 80%; }
+        .msg b { color: #00a884; display: block; font-size: 0.8em; }
+    </style>
+</head>
+<body>
+
+    <div id="login">
+        <h2>Entrar al Chat</h2>
+        <input type="text" id="user" placeholder="Escribe tu nombre...">
+        <button onclick="entrar()">Entrar</button>
+    </div>
+
+    <div id="chat" class="hidden">
+        <div id="messages"></div>
+        <input type="text" id="txt" placeholder="Escribe un mensaje...">
+        <button onclick="enviar()">Enviar</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let nombre = "";
+
+        function entrar() {
+            nombre = document.getElementById('user').value;
+            if(nombre) {
+                document.getElementById('login').classList.add('hidden');
+                document.getElementById('chat').classList.remove('hidden');
+            }
+        }
+
+        function enviar() {
+            const msg = document.getElementById('txt').value;
+            if(msg) {
+                socket.emit('chat message', { user: nombre, text: msg });
+                document.getElementById('txt').value = "";
+            }
+        }
+
+        socket.on('chat message', (data) => {
+            const div = document.createElement('div');
+            div.className = 'msg';
+            div.innerHTML = `<b>${data.user}</b> ${data.text}`;
+            document.getElementById('messages').appendChild(div);
+            document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+        });
+    </script>
+</body>
+</html>
