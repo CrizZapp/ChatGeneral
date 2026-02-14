@@ -7,7 +7,7 @@
 <style>
   body { margin: 0; font-family: sans-serif; background-color: #0b141a; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); height: 100vh; display: flex; flex-direction: column; }
   #login-screen { position: fixed; inset: 0; background: #111b21; display: flex; align-items: center; justify-content: center; z-index: 100; }
-  .login-card { background: #202c33; padding: 30px; border-radius: 15px; text-align: center; color: white; width: 80%; max-width: 300px; }
+  .login-card { background: #202c33; padding: 30px; border-radius: 15px; text-align: center; color: white; width: 80%; max-width: 300px; border: 1px solid #00a884; }
   .login-card input { width: 90%; padding: 12px; border-radius: 8px; border: none; margin: 10px 0; background: #2a3942; color: white; outline: none; text-align: center; }
   header { background: #202c33; padding: 10px 16px; display: flex; align-items: center; color: #e9edef; justify-content: space-between; }
   
@@ -41,16 +41,16 @@
 <div id="login-screen">
   <div class="login-card">
     <h2 style="color:#00a884">WhatsApp Banda</h2>
-    <p id="login-info" style="font-size: 11px; color: #8696a0;">Si tu nombre es nuevo, crearás un PIN.<br>Si ya existe, ingrésalo.</p>
+    <p id="login-info" style="font-size: 11px; color: #8696a0;">Protege tu nombre con un PIN de 4 dígitos.<br>Si el nombre es nuevo, se creará ahora.</p>
     <input type="text" id="user-name" placeholder="Tu apodo...">
-    <input type="password" id="user-pin" placeholder="PIN de 4 dígitos" maxlength="4">
-    <button id="btn-entrar" style="padding: 10px 20px; border-radius: 20px; width: 100%; border:none; background:#00a884; color:white; cursor:pointer; font-weight:bold;">ACCEDER / REGISTRAR</button>
+    <input type="password" id="user-pin" placeholder="PIN" maxlength="4">
+    <button id="btn-entrar" style="padding: 10px 20px; border-radius: 20px; width: 100%; border:none; background:#00a884; color:white; cursor:pointer; font-weight:bold;">ENTRAR / REGISTRAR PIN</button>
   </div>
 </div>
 
 <header>
   <div style="display:flex; align-items:center; gap:10px;">
-    <div id="change-name" style="width:40px; height:40px; background:#6a7175; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;" title="Cerrar sesión / Cambiar nombre">👤</div>
+    <div id="change-name" style="width:40px; height:40px; background:#6a7175; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">👤</div>
     <div style="font-weight:bold;">La Banda 🚀</div>
   </div>
   <button id="btn-admin-trigger" style="background:transparent; border:none; color:#8696a0; font-size: 20px; cursor:pointer;">⚙️</button>
@@ -97,8 +97,6 @@ const cont = document.getElementById("msgs");
 const inputTexto = document.getElementById("txt");
 
 // --- SISTEMA DE LOGIN Y PIN ---
-const loginScreen = document.getElementById("login-screen");
-
 document.getElementById("btn-entrar").onclick = async () => {
   const nom = document.getElementById("user-name").value.trim();
   const pin = document.getElementById("user-pin").value.trim();
@@ -114,7 +112,6 @@ document.getElementById("btn-entrar").onclick = async () => {
   const snapshot = await get(userRef);
 
   if(snapshot.exists()) {
-    // El usuario ya tiene un PIN en Firebase
     if(snapshot.val().pin === pin) {
       exitoLogin(nom);
     } else {
@@ -122,7 +119,7 @@ document.getElementById("btn-entrar").onclick = async () => {
       info.style.color = "#ea0038";
     }
   } else {
-    // El usuario no existe o es de la versión vieja sin PIN -> Se registra ahora
+    // Si no existe, se crea el PIN automáticamente para ese nombre
     await set(userRef, { pin: pin });
     exitoLogin(nom);
   }
@@ -131,23 +128,34 @@ document.getElementById("btn-entrar").onclick = async () => {
 function exitoLogin(nom) {
   miNombre = nom;
   localStorage.setItem("chat_user", nom);
-  loginScreen.style.display = "none";
-  push(mensajesRef, { text: `🛡️ ${nom} ha verificado su identidad.`, tipo: "bot" });
+  document.getElementById("login-screen").style.display = "none";
+  push(mensajesRef, { text: `🛡️ ${nom} ha verificado su cuenta.`, tipo: "bot" });
 }
 
-// --- BOTÓN CAMBIAR NOMBRE (CERRAR SESIÓN) ---
 document.getElementById("change-name").onclick = () => {
-  if(confirm("¿Quieres cerrar sesión para cambiar de nombre o PIN?")) {
+  if(confirm("¿Cerrar sesión para cambiar de nombre o PIN?")) {
     localStorage.removeItem("chat_user");
     location.reload(); 
   }
 };
 
-// --- LÓGICA DE MENSAJES ---
+// --- LÓGICA DEL BOT ---
 const botResponde = (texto) => {
-  setTimeout(() => { push(mensajesRef, { user: "🤖 BOT", text: texto, tipo: "bot-neon" }); }, 500);
+  setTimeout(() => { 
+    push(mensajesRef, { user: "🤖 BOT", text: texto, tipo: "bot-neon" }); 
+  }, 500);
 };
 
+const procesarComandos = (cmd) => {
+  const c = cmd.toLowerCase();
+  if (c === "/help") botResponde("Comandos: /help, /start, /infobot, /hola");
+  else if (c === "/start") botResponde(`¡Hola ${miNombre}! Bot iniciado.`);
+  else if (c === "/infobot") botResponde("Bot de La Banda 🚀. Seguridad por PIN activa.");
+  else if (c === "/hola") botResponde("¡Hola! ¿Cómo estás?");
+  else botResponde(`Comando desconocido: ${cmd}. Usa /help.`);
+};
+
+// --- ESCUCHAR MENSAJES ---
 onChildAdded(query(mensajesRef, limitToLast(100)), (snap) => {
   const datos = snap.val();
   if(datos.tipo === "bot" && datos.text.includes(`❌ ${miNombre} ha sido baneado`)) {
@@ -172,18 +180,13 @@ onChildAdded(query(mensajesRef, limitToLast(100)), (snap) => {
   cont.scrollTop = cont.scrollHeight;
 });
 
-// Si no hay nombre guardado, mostrar login. Si hay, pero no queremos que entren colados, 
-// lo ideal es que siempre pida PIN al abrir la web, pero por ahora lo dejamos persistente.
-if(!miNombre) {
-    loginScreen.style.display = "flex";
-} else {
-    loginScreen.style.display = "none";
-}
+if(miNombre) document.getElementById("login-screen").style.display = "none";
 
 const enviar = () => {
   const msg = inputTexto.value.trim();
   if(!msg || !miNombre || inputTexto.disabled) return;
   push(mensajesRef, { user: miNombre, text: msg, tipo: "normal" });
+  if(msg.startsWith("/")) procesarComandos(msg);
   inputTexto.value = "";
 };
 
@@ -216,7 +219,14 @@ document.getElementById("btn-super").onclick = () => {
   const m = prompt("Mensaje SuperChat:");
   if(m) push(mensajesRef, { user: `⭐ ${miNombre}`, text: m.toUpperCase(), tipo: "superchat" });
 };
+document.getElementById("btn-fake-sys").onclick = () => {
+  const f = prompt("Mensaje de sistema:");
+  if(f) push(mensajesRef, { text: f, tipo: "bot" });
+};
 document.getElementById("btn-clear").onclick = () => { if(confirm("¿Borrar todo?")) remove(mensajesRef).then(() => location.reload()); };
+
+// Persistencia Admin
+if (sessionStorage.getItem("is_admin") === "true") document.getElementById("admin-panel").style.display = "block";
 </script>
 </body>
 </html>
