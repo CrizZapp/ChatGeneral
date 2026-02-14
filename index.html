@@ -8,7 +8,7 @@
   body { margin: 0; font-family: sans-serif; background-color: #0b141a; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); height: 100vh; display: flex; flex-direction: column; }
   #login-screen { position: fixed; inset: 0; background: #111b21; display: flex; align-items: center; justify-content: center; z-index: 100; }
   .login-card { background: #202c33; padding: 30px; border-radius: 15px; text-align: center; color: white; width: 80%; max-width: 300px; }
-  .login-card input { width: 90%; padding: 12px; border-radius: 8px; border: none; margin: 15px 0; background: #2a3942; color: white; outline: none; }
+  .login-card input { width: 90%; padding: 12px; border-radius: 8px; border: none; margin: 10px 0; background: #2a3942; color: white; outline: none; }
   header { background: #202c33; padding: 10px 16px; display: flex; align-items: center; color: #e9edef; justify-content: space-between; }
   
   #admin-panel { display: none; background: #1f2c33; border-bottom: 2px solid #00a884; padding: 12px; color: white; font-size: 13px; }
@@ -53,7 +53,9 @@
 <div id="login-screen">
   <div class="login-card">
     <h2 style="color:#00a884">WhatsApp Banda</h2>
+    <p id="login-info" style="font-size: 11px; color: #8696a0;">Usa un PIN para que nadie robe tu nombre</p>
     <input type="text" id="user-name" placeholder="Tu apodo...">
+    <input type="password" id="user-pin" placeholder="PIN (4 dígitos)" maxlength="4">
     <button id="btn-entrar" style="padding: 10px 20px; border-radius: 20px; width: 100%; border:none; background:#00a884; color:white; cursor:pointer;">ENTRAR AL CHAT</button>
   </div>
 </div>
@@ -86,7 +88,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, remove, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, push, onChildAdded, remove, query, limitToLast, get, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyABaTv7yjGsgIu2A6mj6arml2IHGljt_H4",
@@ -101,10 +103,44 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const mensajesRef = ref(db, "mensajes");
+const authRef = ref(db, "usuarios_auth");
 
 let miNombre = localStorage.getItem("chat_user") || "";
 const cont = document.getElementById("msgs");
 const inputTexto = document.getElementById("txt");
+
+// --- SEGURIDAD DE CUENTA ---
+document.getElementById("btn-entrar").onclick = async () => {
+  const nom = document.getElementById("user-name").value.trim();
+  const pin = document.getElementById("user-pin").value.trim();
+  const info = document.getElementById("login-info");
+
+  if(!nom || pin.length < 4) {
+    info.innerText = "❌ Pon nombre y PIN de 4 dígitos";
+    info.style.color = "#ea0038";
+    return;
+  }
+
+  const snap = await get(ref(db, `usuarios_auth/${nom}`));
+  if(snap.exists()) {
+    if(snap.val().pin === pin) {
+      entrar(nom);
+    } else {
+      info.innerText = "❌ PIN INCORRECTO. Ese nombre ya está en uso.";
+      info.style.color = "#ea0038";
+    }
+  } else {
+    await set(ref(db, `usuarios_auth/${nom}`), { pin: pin });
+    entrar(nom);
+  }
+};
+
+function entrar(nom) {
+  miNombre = nom;
+  localStorage.setItem("chat_user", nom);
+  document.getElementById("login-screen").style.display = "none";
+  push(mensajesRef, { text: `✅ ${nom} ha iniciado sesión segura.`, tipo: "bot" });
+}
 
 // --- LÓGICA DE BOT ---
 const botResponde = (texto) => {
@@ -131,8 +167,6 @@ const procesarComandos = (cmd) => {
 const checkAdminStatus = () => {
   if (sessionStorage.getItem("is_admin") === "true") {
     document.getElementById("admin-panel").style.display = "block";
-    inputTexto.disabled = false;
-    inputTexto.placeholder = "Escribe un mensaje";
   }
 };
 
@@ -171,19 +205,11 @@ onChildAdded(query(mensajesRef, limitToLast(100)), (snap) => {
 
 if(miNombre) document.getElementById("login-screen").style.display = "none";
 
-document.getElementById("btn-entrar").onclick = () => {
-  const nom = document.getElementById("user-name").value.trim();
-  if(nom) {
-    miNombre = nom;
-    localStorage.setItem("chat_user", nom);
-    location.reload(); 
-  }
-};
-
+// --- BOTÓN CAMBIAR NOMBRE ---
 document.getElementById("change-name").onclick = () => {
-  const nuevo = prompt("Nuevo apodo:", miNombre);
+  const nuevo = prompt("Nuevo apodo (necesitarás el PIN si ya existe):", miNombre);
   if(nuevo && nuevo.trim() !== "") {
-    localStorage.setItem("chat_user", nuevo.trim());
+    localStorage.removeItem("chat_user"); // Forzamos relog para pedir PIN
     location.reload();
   }
 };
@@ -191,15 +217,10 @@ document.getElementById("change-name").onclick = () => {
 const enviar = () => {
   const msg = inputTexto.value.trim();
   if(!msg || !miNombre || inputTexto.disabled) return;
-  
-  // Publicar mensaje del usuario
   push(mensajesRef, { user: miNombre, text: msg, tipo: "normal" });
-  
-  // Si empieza con /, procesar como comando
   if(msg.startsWith("/")) {
     procesarComandos(msg);
   }
-  
   inputTexto.value = "";
 };
 
@@ -217,8 +238,6 @@ document.getElementById("btn-admin-trigger").onclick = () => {
     sessionStorage.setItem("is_admin", "true");
     document.getElementById("admin-panel").style.display = "block";
     push(mensajesRef, { text: `📢 ¡${miNombre} ha entrado al modo Admin! 👑`, tipo: "bot" });
-    inputTexto.disabled = false;
-    inputTexto.placeholder = "Escribe un mensaje";
   }
 };
 
