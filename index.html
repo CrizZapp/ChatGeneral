@@ -30,10 +30,17 @@
   .bot-neon { background: #1a1a1a !important; border: 2px solid #ff0055; align-self: center !important; animation: neonBorder 3s infinite linear; box-shadow: 0 0 10px rgba(255,0,85,0.5); }
   @keyframes neonBorder { 0% { border-color: #ff0055; box-shadow: 0 0 10px #ff0055; } 33% { border-color: #00aaff; box-shadow: 0 0 10px #00aaff; } 66% { border-color: #aa00ff; box-shadow: 0 0 10px #aa00ff; } 100% { border-color: #ff0055; box-shadow: 0 0 10px #ff0055; } }
 
+  .msg img { max-width: 100%; border-radius: 8px; margin-top: 5px; display: block; }
+
   .superchat-msg { background: linear-gradient(135deg, #ffbc00, #ff8c00) !important; color: #000 !important; align-self: center !important; text-align: center; border: 2px solid #fff; font-weight: bold; }
-  footer { background: #202c33; padding: 10px; display: flex; gap: 10px; }
+  footer { background: #202c33; padding: 10px; display: flex; gap: 10px; align-items: center; position: relative; }
   #txt { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 25px; color: white; outline: none; }
   #btn-send { width: 45px; height: 45px; border-radius: 50%; font-size: 20px; border:none; background:#00a884; color:white; cursor:pointer; }
+  
+  /* Menú de adjuntos */
+  #attach-menu { display: none; position: absolute; bottom: 70px; left: 10px; background: #233138; border-radius: 12px; padding: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 200; }
+  .attach-option { color: white; padding: 8px 15px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 14px; }
+  .attach-option:hover { background: #182229; }
 </style>
 </head>
 <body>
@@ -69,7 +76,15 @@
 
 <div id="msgs"></div>
 
+<div id="attach-menu">
+  <div class="attach-option" id="opt-image">
+    <span style="background:#bf59cf; width:30px; height:30px; display:flex; align-items:center; justify-content:center; border-radius:50%;">🖼️</span> Imagen
+  </div>
+</div>
+
 <footer>
+  <input type="file" id="file-input" accept="image/*" style="display: none;">
+  <button id="btn-attach" style="background:transparent; border:none; color:#8696a0; font-size: 30px; cursor:pointer; font-weight: 300;">+</button>
   <input id="txt" placeholder="Escribe un mensaje" autocomplete="off">
   <button id="btn-send">➤</button>
 </footer>
@@ -95,6 +110,31 @@ const mensajesRef = ref(db, "mensajes");
 let miNombre = localStorage.getItem("chat_user") || "";
 const cont = document.getElementById("msgs");
 const inputTexto = document.getElementById("txt");
+const fileInput = document.getElementById("file-input");
+const attachMenu = document.getElementById("attach-menu");
+
+// --- LÓGICA DE ADJUNTOS ---
+document.getElementById("btn-attach").onclick = (e) => {
+  e.stopPropagation();
+  attachMenu.style.display = attachMenu.style.display === "block" ? "none" : "block";
+};
+document.onclick = () => attachMenu.style.display = "none";
+
+document.getElementById("opt-image").onclick = () => {
+  fileInput.click();
+  attachMenu.style.display = "none";
+};
+
+fileInput.onchange = (e) => {
+  const file = e.target.files[0];
+  if (!file || !miNombre) return;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    push(mensajesRef, { user: miNombre, image: event.target.result, tipo: "normal" });
+  };
+  reader.readAsDataURL(file);
+  fileInput.value = "";
+};
 
 // --- SISTEMA DE LOGIN Y PIN ---
 document.getElementById("btn-entrar").onclick = async () => {
@@ -119,7 +159,6 @@ document.getElementById("btn-entrar").onclick = async () => {
       info.style.color = "#ea0038";
     }
   } else {
-    // Si no existe, se crea el PIN automáticamente para ese nombre
     await set(userRef, { pin: pin });
     exitoLogin(nom);
   }
@@ -139,7 +178,6 @@ document.getElementById("change-name").onclick = () => {
   }
 };
 
-// --- LÓGICA DEL BOT ---
 const botResponde = (texto) => {
   setTimeout(() => { 
     push(mensajesRef, { user: "🤖 BOT", text: texto, tipo: "bot-neon" }); 
@@ -155,26 +193,35 @@ const procesarComandos = (cmd) => {
   else botResponde(`Comando desconocido: ${cmd}. Usa /help.`);
 };
 
-// --- ESCUCHAR MENSAJES ---
 onChildAdded(query(mensajesRef, limitToLast(100)), (snap) => {
   const datos = snap.val();
-  if(datos.tipo === "bot" && datos.text.includes(`❌ ${miNombre} ha sido baneado`)) {
+  if(datos.tipo === "bot" && datos.text && datos.text.includes(`❌ ${miNombre} ha sido baneado`)) {
     inputTexto.disabled = true;
     inputTexto.placeholder = "ESTÁS BANEADO";
   }
-  if(datos.tipo === "bot" && datos.text.includes(`✅ ${miNombre} ha sido desbaneado`)) {
+  if(datos.tipo === "bot" && datos.text && datos.text.includes(`✅ ${miNombre} ha sido desbaneado`)) {
     inputTexto.disabled = false;
     inputTexto.placeholder = "Escribe un mensaje";
   }
 
   const div = document.createElement("div");
-  if(datos.tipo === "bot") { div.className = "msg bot-msg"; div.innerText = datos.text; }
-  else if(datos.tipo === "bot-neon") { div.className = "msg bot-neon"; div.innerHTML = `<b>${datos.user}</b>${datos.text}`; }
-  else if(datos.tipo === "superchat") { div.className = "msg superchat-msg"; div.innerHTML = `<b>${datos.user}</b>${datos.text}`; }
-  else {
+  let htmlContent = `<b>${datos.user || 'Sistema'}</b>`;
+  if(datos.image) htmlContent += `<img src="${datos.image}">`;
+  if(datos.text) htmlContent += `<span>${datos.text}</span>`;
+
+  if(datos.tipo === "bot") { 
+    div.className = "msg bot-msg"; 
+    div.innerText = datos.text; 
+  } else if(datos.tipo === "bot-neon") { 
+    div.className = "msg bot-neon"; 
+    div.innerHTML = htmlContent; 
+  } else if(datos.tipo === "superchat") { 
+    div.className = "msg superchat-msg"; 
+    div.innerHTML = htmlContent; 
+  } else {
     const esMio = datos.user === miNombre;
     div.className = "msg " + (esMio ? "mio" : "recibido");
-    div.innerHTML = `<b>${datos.user}</b>${datos.text}`;
+    div.innerHTML = htmlContent;
   }
   cont.appendChild(div);
   cont.scrollTop = cont.scrollHeight;
@@ -193,7 +240,6 @@ const enviar = () => {
 document.getElementById("btn-send").onclick = enviar;
 inputTexto.onkeypress = (e) => { if(e.key === "Enter") enviar(); };
 
-// --- ADMIN ---
 document.getElementById("btn-admin-trigger").onclick = () => {
   if (sessionStorage.getItem("is_admin") === "true") {
     document.getElementById("admin-panel").style.display = "block";
@@ -225,7 +271,6 @@ document.getElementById("btn-fake-sys").onclick = () => {
 };
 document.getElementById("btn-clear").onclick = () => { if(confirm("¿Borrar todo?")) remove(mensajesRef).then(() => location.reload()); };
 
-// Persistencia Admin
 if (sessionStorage.getItem("is_admin") === "true") document.getElementById("admin-panel").style.display = "block";
 </script>
 </body>
