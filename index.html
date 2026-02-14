@@ -11,7 +11,6 @@
   .login-card input { width: 90%; padding: 12px; border-radius: 8px; border: none; margin: 15px 0; background: #2a3942; color: white; outline: none; }
   header { background: #202c33; padding: 10px 16px; display: flex; align-items: center; color: #e9edef; justify-content: space-between; }
   
-  /* ADMIN PANEL CORREGIDO */
   #admin-panel { display: none; background: #1f2c33; border-bottom: 2px solid #00a884; padding: 12px; color: white; font-size: 13px; }
   .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
   .admin-btn { padding: 8px; border-radius: 6px; border: none; font-size: 11px; cursor: pointer; font-weight: bold; }
@@ -46,7 +45,7 @@
 
   footer { background: #202c33; padding: 10px; display: flex; gap: 10px; }
   #txt { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 25px; color: white; outline: none; }
-  #btn-send { width: 45px; height: 45px; border-radius: 50%; font-size: 20px; border:none; background:#00a884; color:white; }
+  #btn-send { width: 45px; height: 45px; border-radius: 50%; font-size: 20px; border:none; background:#00a884; color:white; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -55,7 +54,7 @@
   <div class="login-card">
     <h2 style="color:#00a884">WhatsApp Banda</h2>
     <input type="text" id="user-name" placeholder="Tu apodo...">
-    <button id="btn-entrar" style="padding: 10px 20px; border-radius: 20px; width: 100%; border:none; background:#00a884; color:white;">ENTRAR AL CHAT</button>
+    <button id="btn-entrar" style="padding: 10px 20px; border-radius: 20px; width: 100%; border:none; background:#00a884; color:white; cursor:pointer;">ENTRAR AL CHAT</button>
   </div>
 </div>
 
@@ -64,7 +63,7 @@
     <div id="change-name" style="width:40px; height:40px; background:#6a7175; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">👤</div>
     <div style="font-weight:bold;">La Banda 🚀</div>
   </div>
-  <button id="btn-admin-trigger" style="background:transparent; border:none; color:#8696a0; font-size: 20px;">⚙️</button>
+  <button id="btn-admin-trigger" style="background:transparent; border:none; color:#8696a0; font-size: 20px; cursor:pointer;">⚙️</button>
 </header>
 
 <div id="admin-panel">
@@ -107,7 +106,28 @@ let miNombre = localStorage.getItem("chat_user") || "";
 const cont = document.getElementById("msgs");
 const inputTexto = document.getElementById("txt");
 
-// --- PERSISTENCIA DE ADMIN ---
+// --- LÓGICA DE BOT ---
+const botResponde = (texto) => {
+  setTimeout(() => {
+    push(mensajesRef, { user: "🤖 BOT", text: texto, tipo: "bot-neon" });
+  }, 500);
+};
+
+const procesarComandos = (cmd) => {
+  const c = cmd.toLowerCase();
+  if (c === "/help") {
+    botResponde("Comandos: /help, /start, /infobot, /hola");
+  } else if (c === "/start") {
+    botResponde(`¡Hola ${miNombre}! Bot iniciado. Usa /help para ayuda.`);
+  } else if (c === "/infobot") {
+    botResponde("Bot interactivo de La Banda 🚀. Creado para control y diversión.");
+  } else if (c === "/hola") {
+    botResponde("¡Hola! ¿Cómo estás?");
+  } else {
+    botResponde(`Comando desconocido: ${cmd}. Usa /help para ver la lista.`);
+  }
+};
+
 const checkAdminStatus = () => {
   if (sessionStorage.getItem("is_admin") === "true") {
     document.getElementById("admin-panel").style.display = "block";
@@ -162,7 +182,7 @@ document.getElementById("btn-entrar").onclick = () => {
 
 document.getElementById("change-name").onclick = () => {
   const nuevo = prompt("Nuevo apodo:", miNombre);
-  if(nuevo) {
+  if(nuevo && nuevo.trim() !== "") {
     localStorage.setItem("chat_user", nuevo.trim());
     location.reload();
   }
@@ -171,18 +191,22 @@ document.getElementById("change-name").onclick = () => {
 const enviar = () => {
   const msg = inputTexto.value.trim();
   if(!msg || !miNombre || inputTexto.disabled) return;
+  
+  // Publicar mensaje del usuario
   push(mensajesRef, { user: miNombre, text: msg, tipo: "normal" });
+  
+  // Si empieza con /, procesar como comando
   if(msg.startsWith("/")) {
-    if(msg === "/help") push(mensajesRef, { user: "🤖 BOT", text: "Comandos: /help, /start, /hola", tipo: "bot-neon" });
-    if(msg === "/hola") push(mensajesRef, { user: "🤖 BOT", text: "¡Hola! ¿Cómo estás?", tipo: "bot-neon" });
+    procesarComandos(msg);
   }
+  
   inputTexto.value = "";
 };
 
 document.getElementById("btn-send").onclick = enviar;
 inputTexto.onkeypress = (e) => { if(e.key === "Enter") enviar(); };
 
-// --- LOGICA ADMIN MEJORADA ---
+// --- ADMIN ---
 document.getElementById("btn-admin-trigger").onclick = () => {
   if (sessionStorage.getItem("is_admin") === "true") {
     document.getElementById("admin-panel").style.display = "block";
@@ -200,7 +224,6 @@ document.getElementById("btn-admin-trigger").onclick = () => {
 
 document.getElementById("btn-close-admin").onclick = () => {
   document.getElementById("admin-panel").style.display = "none";
-  // Opcional: sessionStorage.removeItem("is_admin"); // Si quieres que pida código siempre
 };
 
 document.getElementById("btn-ban-real").onclick = () => {
