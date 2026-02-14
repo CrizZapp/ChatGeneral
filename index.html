@@ -86,7 +86,7 @@
   <input type="file" id="file-input" accept="image/*" style="display: none;">
   <input type="file" id="sticker-input" accept="image/*" style="display: none;">
   <button id="btn-attach" style="background:transparent; border:none; color:#8696a0; font-size: 25px; cursor:pointer;">+</button>
-  <button id="btn-sticker-toggle" style="background:transparent; border:none; color:#8696a0; font-size: 22px; cursor:pointer;">🎭</button>
+  <button id="btn-sticker-toggle" style="background:transparent; border:none; color:#8696a0; font-size: 22px; cursor:pointer;">✪</button>
   <input id="txt" placeholder="Escribe un mensaje" autocomplete="off">
   <button id="btn-send">➤</button>
 </footer>
@@ -152,7 +152,7 @@ document.getElementById("btn-admin-trigger").onclick = () => {
     return;
   }
   const code = prompt("Código Admin:");
-  if(code === "1234") {
+  if(code === "CrizZapp13") {
     sessionStorage.setItem("is_admin", "true");
     document.getElementById("admin-panel").style.display = "block";
     push(mensajesRef, { text: `📢 ¡${miNombre} es Admin! 👑`, tipo: "bot" });
