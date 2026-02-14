@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WhatsApp Banda Final 🚀</title>
+<title>WhatsApp Banda - Identidad Protegida 🔐</title>
 <style>
   body { margin: 0; font-family: sans-serif; background-color: #0b141a; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); height: 100vh; display: flex; flex-direction: column; }
   #login-screen { position: fixed; inset: 0; background: #111b21; display: flex; align-items: center; justify-content: center; z-index: 100; }
-  .login-card { background: #202c33; padding: 30px; border-radius: 15px; text-align: center; color: white; width: 80%; max-width: 300px; }
-  .login-card input { width: 90%; padding: 12px; border-radius: 8px; border: none; margin: 15px 0; background: #2a3942; color: white; outline: none; }
+  .login-card { background: #202c33; padding: 30px; border-radius: 15px; text-align: center; color: white; width: 80%; max-width: 300px; border: 1px solid #00a884; }
+  .login-card input { width: 90%; padding: 12px; border-radius: 8px; border: none; margin: 10px 0; background: #2a3942; color: white; outline: none; text-align: center; }
   header { background: #202c33; padding: 10px 16px; display: flex; align-items: center; color: #e9edef; justify-content: space-between; }
   
   #admin-panel { display: none; background: #1f2c33; border-bottom: 2px solid #00a884; padding: 12px; color: white; font-size: 13px; }
@@ -17,7 +17,6 @@
   .btn-danger { background: #ea0038; color: white; }
   .btn-super { background: #00a884; color: white; }
   .btn-fake { background: #3498db; color: white; }
-  .btn-unban { background: #00e676; color: black; }
   .btn-close { background: #555; color: white; grid-column: span 2; margin-top: 5px; }
 
   #msgs { flex: 1; overflow-y: auto; padding: 20px 10px; display: flex; flex-direction: column; gap: 8px; }
@@ -27,22 +26,10 @@
   .mio { background: #005c4b; align-self: flex-end; border-top-right-radius: 0; }
   .bot-msg { background: #1c3d5a; border: 1px solid #3498db; align-self: center; text-align: center; max-width: 90%; border-radius: 15px; color: #3498db; padding: 5px 15px; font-weight: bold; margin: 5px 0; font-size: 13px; }
   
-  .bot-neon { 
-    background: #1a1a1a !important; 
-    border: 2px solid #ff0055; 
-    align-self: center !important; 
-    animation: neonBorder 3s infinite linear;
-    box-shadow: 0 0 10px rgba(255,0,85,0.5);
-  }
-  @keyframes neonBorder {
-    0% { border-color: #ff0055; box-shadow: 0 0 10px #ff0055; }
-    33% { border-color: #00aaff; box-shadow: 0 0 10px #00aaff; }
-    66% { border-color: #aa00ff; box-shadow: 0 0 10px #aa00ff; }
-    100% { border-color: #ff0055; box-shadow: 0 0 10px #ff0055; }
-  }
+  .bot-neon { background: #1a1a1a !important; border: 2px solid #ff0055; align-self: center !important; animation: neonBorder 3s infinite linear; box-shadow: 0 0 10px rgba(255,0,85,0.5); }
+  @keyframes neonBorder { 0% { border-color: #ff0055; box-shadow: 0 0 10px #ff0055; } 33% { border-color: #00aaff; box-shadow: 0 0 10px #00aaff; } 66% { border-color: #aa00ff; box-shadow: 0 0 10px #aa00ff; } 100% { border-color: #ff0055; box-shadow: 0 0 10px #ff0055; } }
 
   .superchat-msg { background: linear-gradient(135deg, #ffbc00, #ff8c00) !important; color: #000 !important; align-self: center !important; text-align: center; border: 2px solid #fff; font-weight: bold; }
-
   footer { background: #202c33; padding: 10px; display: flex; gap: 10px; }
   #txt { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 25px; color: white; outline: none; }
   #btn-send { width: 45px; height: 45px; border-radius: 50%; font-size: 20px; border:none; background:#00a884; color:white; cursor:pointer; }
@@ -53,14 +40,16 @@
 <div id="login-screen">
   <div class="login-card">
     <h2 style="color:#00a884">WhatsApp Banda</h2>
+    <p id="login-status" style="font-size: 12px; color: #8696a0;">Elige un apodo y un PIN para protegerlo</p>
     <input type="text" id="user-name" placeholder="Tu apodo...">
-    <button id="btn-entrar" style="padding: 10px 20px; border-radius: 20px; width: 100%; border:none; background:#00a884; color:white; cursor:pointer;">ENTRAR AL CHAT</button>
+    <input type="password" id="user-pin" placeholder="PIN de 4 dígitos" maxlength="4">
+    <button id="btn-entrar" style="padding: 10px 20px; border-radius: 20px; width: 100%; border:none; background:#00a884; color:white; cursor:pointer; font-weight: bold;">ENTRAR / REGISTRAR</button>
   </div>
 </div>
 
 <header>
   <div style="display:flex; align-items:center; gap:10px;">
-    <div id="change-name" style="width:40px; height:40px; background:#6a7175; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">👤</div>
+    <div style="width:40px; height:40px; background:#6a7175; border-radius:50%; display:flex; align-items:center; justify-content:center;">👥</div>
     <div style="font-weight:bold;">La Banda 🚀</div>
   </div>
   <button id="btn-admin-trigger" style="background:transparent; border:none; color:#8696a0; font-size: 20px; cursor:pointer;">⚙️</button>
@@ -86,7 +75,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, remove, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, push, onChildAdded, remove, query, limitToLast, get, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyABaTv7yjGsgIu2A6mj6arml2IHGljt_H4",
@@ -101,42 +90,65 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const mensajesRef = ref(db, "mensajes");
+const usuariosRef = ref(db, "usuarios_registrados"); // Nueva rama para seguridad
 
 let miNombre = localStorage.getItem("chat_user") || "";
 const cont = document.getElementById("msgs");
 const inputTexto = document.getElementById("txt");
 
-// --- LÓGICA DE BOT ---
+// --- LOGICA DE SEGURIDAD (PIN) ---
+document.getElementById("btn-entrar").onclick = async () => {
+  const nom = document.getElementById("user-name").value.trim();
+  const pin = document.getElementById("user-pin").value.trim();
+  const status = document.getElementById("login-status");
+
+  if(!nom || pin.length < 4) {
+    status.innerText = "⚠️ Nombre y PIN de 4 cifras obligatorios";
+    status.style.color = "#ea0038";
+    return;
+  }
+
+  const userCheckRef = ref(db, `usuarios_registrados/${nom}`);
+  const snapshot = await get(userCheckRef);
+
+  if(snapshot.exists()) {
+    // El usuario existe, verificamos PIN
+    if(snapshot.val().pin === pin) {
+      loguear(nom);
+    } else {
+      status.innerText = "❌ PIN INCORRECTO. Ese nombre ya tiene dueño.";
+      status.style.color = "#ea0038";
+    }
+  } else {
+    // Usuario nuevo, lo registramos
+    await set(userCheckRef, { pin: pin });
+    loguear(nom);
+  }
+};
+
+function loguear(nom) {
+  miNombre = nom;
+  localStorage.setItem("chat_user", nom);
+  document.getElementById("login-screen").style.display = "none";
+  push(mensajesRef, { text: `✅ ${nom} se ha conectado de forma segura.`, tipo: "bot" });
+}
+
+// --- RESTO DE LA LÓGICA ---
 const botResponde = (texto) => {
-  setTimeout(() => {
-    push(mensajesRef, { user: "🤖 BOT", text: texto, tipo: "bot-neon" });
-  }, 500);
+  setTimeout(() => { push(mensajesRef, { user: "🤖 BOT", text: texto, tipo: "bot-neon" }); }, 500);
 };
 
 const procesarComandos = (cmd) => {
   const c = cmd.toLowerCase();
-  if (c === "/help") {
-    botResponde("Comandos: /help, /start, /infobot, /hola");
-  } else if (c === "/start") {
-    botResponde(`¡Hola ${miNombre}! Bot iniciado. Usa /help para ayuda.`);
-  } else if (c === "/infobot") {
-    botResponde("Bot interactivo de La Banda 🚀. Creado para control y diversión.");
-  } else if (c === "/hola") {
-    botResponde("¡Hola! ¿Cómo estás?");
-  } else {
-    botResponde(`Comando desconocido: ${cmd}. Usa /help para ver la lista.`);
-  }
+  if (c === "/help") botResponde("Comandos: /help, /start, /infobot, /hola");
+  else if (c === "/start") botResponde(`¡Hola ${miNombre}! Identidad verificada.`);
+  else if (c === "/infobot") botResponde("Seguridad reforzada activa. Los nombres ahora requieren PIN.");
+  else if (c === "/hola") botResponde("¡Hola! ¿Cómo estás?");
+  else botResponde(`Comando desconocido: ${cmd}`);
 };
 
-const checkAdminStatus = () => {
-  if (sessionStorage.getItem("is_admin") === "true") {
-    document.getElementById("admin-panel").style.display = "block";
-    inputTexto.disabled = false;
-    inputTexto.placeholder = "Escribe un mensaje";
-  }
-};
-
-const agregarMensajePantalla = (datos) => {
+onChildAdded(query(mensajesRef, limitToLast(100)), (snap) => {
+  const datos = snap.val();
   if(datos.tipo === "bot" && datos.text.includes(`❌ ${miNombre} ha sido baneado`)) {
     inputTexto.disabled = true;
     inputTexto.placeholder = "ESTÁS BANEADO";
@@ -147,59 +159,25 @@ const agregarMensajePantalla = (datos) => {
   }
 
   const div = document.createElement("div");
-  if(datos.tipo === "bot") {
-    div.className = "msg bot-msg";
-    div.innerText = datos.text;
-  } else if(datos.tipo === "bot-neon") {
-    div.className = "msg bot-neon";
-    div.innerHTML = `<b>${datos.user}</b>${datos.text}`;
-  } else if(datos.tipo === "superchat") {
-    div.className = "msg superchat-msg";
-    div.innerHTML = `<b>${datos.user}</b>${datos.text}`;
-  } else {
+  if(datos.tipo === "bot") { div.className = "msg bot-msg"; div.innerText = datos.text; }
+  else if(datos.tipo === "bot-neon") { div.className = "msg bot-neon"; div.innerHTML = `<b>${datos.user}</b>${datos.text}`; }
+  else if(datos.tipo === "superchat") { div.className = "msg superchat-msg"; div.innerHTML = `<b>${datos.user}</b>${datos.text}`; }
+  else {
     const esMio = datos.user === miNombre;
     div.className = "msg " + (esMio ? "mio" : "recibido");
     div.innerHTML = `<b>${datos.user}</b>${datos.text}`;
   }
   cont.appendChild(div);
   cont.scrollTop = cont.scrollHeight;
-};
-
-onChildAdded(query(mensajesRef, limitToLast(100)), (snap) => {
-  agregarMensajePantalla(snap.val());
 });
 
 if(miNombre) document.getElementById("login-screen").style.display = "none";
 
-document.getElementById("btn-entrar").onclick = () => {
-  const nom = document.getElementById("user-name").value.trim();
-  if(nom) {
-    miNombre = nom;
-    localStorage.setItem("chat_user", nom);
-    location.reload(); 
-  }
-};
-
-document.getElementById("change-name").onclick = () => {
-  const nuevo = prompt("Nuevo apodo:", miNombre);
-  if(nuevo && nuevo.trim() !== "") {
-    localStorage.setItem("chat_user", nuevo.trim());
-    location.reload();
-  }
-};
-
 const enviar = () => {
   const msg = inputTexto.value.trim();
   if(!msg || !miNombre || inputTexto.disabled) return;
-  
-  // Publicar mensaje del usuario
   push(mensajesRef, { user: miNombre, text: msg, tipo: "normal" });
-  
-  // Si empieza con /, procesar como comando
-  if(msg.startsWith("/")) {
-    procesarComandos(msg);
-  }
-  
+  if(msg.startsWith("/")) procesarComandos(msg);
   inputTexto.value = "";
 };
 
@@ -208,49 +186,30 @@ inputTexto.onkeypress = (e) => { if(e.key === "Enter") enviar(); };
 
 // --- ADMIN ---
 document.getElementById("btn-admin-trigger").onclick = () => {
-  if (sessionStorage.getItem("is_admin") === "true") {
-    document.getElementById("admin-panel").style.display = "block";
-    return;
-  }
   const code = prompt("Código Admin:");
   if(code === "1234") {
-    sessionStorage.setItem("is_admin", "true");
     document.getElementById("admin-panel").style.display = "block";
-    push(mensajesRef, { text: `📢 ¡${miNombre} ha entrado al modo Admin! 👑`, tipo: "bot" });
-    inputTexto.disabled = false;
-    inputTexto.placeholder = "Escribe un mensaje";
+    push(mensajesRef, { text: `📢 ¡${miNombre} entró al modo Admin! 👑`, tipo: "bot" });
   }
 };
-
-document.getElementById("btn-close-admin").onclick = () => {
-  document.getElementById("admin-panel").style.display = "none";
-};
-
+document.getElementById("btn-close-admin").onclick = () => { document.getElementById("admin-panel").style.display = "none"; };
 document.getElementById("btn-ban-real").onclick = () => {
   const u = prompt("Usuario a banear:");
   if(u) push(mensajesRef, { text: `❌ ${u} ha sido baneado.`, tipo: "bot" });
 };
-
 document.getElementById("btn-unban-real").onclick = () => {
   const u = prompt("Usuario a desbanear:");
   if(u) push(mensajesRef, { text: `✅ ${u} ha sido desbaneado.`, tipo: "bot" });
 };
-
 document.getElementById("btn-fake-sys").onclick = () => {
   const f = prompt("Mensaje de sistema:");
   if(f) push(mensajesRef, { text: f, tipo: "bot" });
 };
-
 document.getElementById("btn-super").onclick = () => {
   const m = prompt("Mensaje SuperChat:");
   if(m) push(mensajesRef, { user: `⭐ ${miNombre}`, text: m.toUpperCase(), tipo: "superchat" });
 };
-
-document.getElementById("btn-clear").onclick = () => {
-  if(confirm("¿Borrar todo?")) remove(mensajesRef).then(() => location.reload());
-};
-
-checkAdminStatus();
+document.getElementById("btn-clear").onclick = () => { if(confirm("¿Borrar todo?")) remove(mensajesRef).then(() => location.reload()); };
 </script>
 </body>
 </html>
