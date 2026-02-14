@@ -9,6 +9,7 @@
   #login-screen { position: fixed; inset: 0; background: #111b21; display: flex; align-items: center; justify-content: center; z-index: 100; }
   .login-card { background: #202c33; padding: 30px; border-radius: 15px; text-align: center; color: white; width: 80%; max-width: 300px; border: 1px solid #00a884; }
   .login-card input { width: 90%; padding: 12px; border-radius: 8px; border: none; margin: 10px 0; background: #2a3942; color: white; outline: none; text-align: center; }
+  
   header { background: #202c33; padding: 10px 16px; display: flex; align-items: center; color: #e9edef; justify-content: space-between; }
   
   #admin-panel { display: none; background: #1f2c33; border-bottom: 2px solid #00a884; padding: 12px; color: white; font-size: 13px; }
@@ -25,27 +26,20 @@
   .msg b { display: block; font-size: 12px; margin-bottom: 3px; color: #ffd07a; }
   .recibido { background: #202c33; align-self: flex-start; border-top-left-radius: 0; }
   .mio { background: #005c4b; align-self: flex-end; border-top-right-radius: 0; }
+  .bot-msg { background: #1c3d5a; border: 1px solid #3498db; align-self: center; text-align: center; max-width: 90%; border-radius: 15px; color: #3498db; padding: 5px 15px; font-weight: bold; margin: 5px 0; font-size: 13px; }
   
-  /* ESTILO STICKER */
+  /* STICKERS */
   .sticker-msg { background: transparent !important; box-shadow: none !important; padding: 0 !important; }
-  .sticker-msg img { width: 150px; height: 150px; object-fit: contain; }
-  .sticker-msg b { color: #8696a0; margin-left: 5px; }
-
+  .sticker-msg img { width: 140px; height: 140px; object-fit: contain; }
   .msg img { max-width: 100%; border-radius: 8px; margin-top: 5px; display: block; }
 
-  footer { background: #202c33; padding: 10px; display: flex; gap: 10px; align-items: center; position: relative; }
-  #txt { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 25px; color: white; outline: none; }
-  #btn-send { width: 45px; height: 45px; border-radius: 50%; font-size: 20px; border:none; background:#00a884; color:white; cursor:pointer; }
-  
-  #attach-menu { display: none; position: absolute; bottom: 70px; left: 10px; background: #233138; border-radius: 12px; padding: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 200; }
-  
-  /* PANEL DE STICKERS */
-  #sticker-panel { display: none; background: #0b141a; height: 250px; border-top: 1px solid #202c33; overflow-y: auto; padding: 10px; }
-  .sticker-section { margin-bottom: 15px; }
-  .sticker-section h4 { color: #00a884; margin: 5px 0; font-size: 12px; text-transform: uppercase; }
+  #sticker-panel { display: none; background: #0b141a; height: 220px; border-top: 1px solid #202c33; overflow-y: auto; padding: 10px; }
   .sticker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
   .sticker-item { width: 100%; aspect-ratio: 1/1; cursor: pointer; object-fit: contain; background: #111b21; border-radius: 5px; }
-  .btn-add-sticker { width: 100%; aspect-ratio: 1/1; border: 2px dashed #8696a0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #8696a0; font-size: 24px; cursor: pointer; }
+
+  footer { background: #202c33; padding: 10px; display: flex; gap: 10px; align-items: center; }
+  #txt { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 25px; color: white; outline: none; }
+  #btn-send { width: 45px; height: 45px; border-radius: 50%; border:none; background:#00a884; color:white; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -69,6 +63,10 @@
 
 <div id="admin-panel">
   <div class="admin-grid">
+    <button id="btn-super" class="admin-btn btn-super">🌟 SUPERCHAT</button>
+    <button id="btn-fake-sys" class="admin-btn btn-fake">🎭 FAKE SYS</button>
+    <button id="btn-ban-real" class="admin-btn btn-danger">🚫 BANEAR</button>
+    <button id="btn-unban-real" class="admin-btn btn-unban">✅ DESBANEAR</button>
     <button id="btn-clear" class="admin-btn btn-danger">🗑️ BORRAR TODO</button>
     <button id="btn-close-admin" class="admin-btn btn-close">❌ CERRAR PANEL</button>
   </div>
@@ -76,28 +74,19 @@
 
 <div id="msgs"></div>
 
-<div id="attach-menu">
-  <div id="opt-image" style="color:white; cursor:pointer; padding:5px;">🖼️ Imagen</div>
-</div>
-
 <div id="sticker-panel">
-  <div class="sticker-section">
-    <h4>Tus Stickers</h4>
-    <div class="sticker-grid" id="my-stickers">
-      <div class="btn-add-sticker" id="add-sticker-btn">+</div>
-    </div>
+  <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <span style="color:#00a884; font-size: 12px; font-weight: bold;">STICKERS GLOBALES</span>
+    <button id="add-sticker-btn" style="background:#00a884; border:none; color:white; border-radius:5px; padding: 2px 10px; cursor:pointer;">+ CREAR</button>
   </div>
-  <div class="sticker-section">
-    <h4>Globales</h4>
-    <div class="sticker-grid" id="global-stickers"></div>
-  </div>
+  <div class="sticker-grid" id="global-stickers"></div>
 </div>
 
 <footer>
   <input type="file" id="file-input" accept="image/*" style="display: none;">
   <input type="file" id="sticker-input" accept="image/*" style="display: none;">
   <button id="btn-attach" style="background:transparent; border:none; color:#8696a0; font-size: 25px; cursor:pointer;">+</button>
-  <button id="btn-sticker-toggle" style="background:transparent; border:none; color:#8696a0; font-size: 22px; cursor:pointer;">✪</button>
+  <button id="btn-sticker-toggle" style="background:transparent; border:none; color:#8696a0; font-size: 22px; cursor:pointer;">🎭</button>
   <input id="txt" placeholder="Escribe un mensaje" autocomplete="off">
   <button id="btn-send">➤</button>
 </footer>
@@ -119,20 +108,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const mensajesRef = ref(db, "mensajes");
-const stickersRef = ref(db, "stickers_globales");
+const stickersRef = ref(db, "stickers_v2");
 
 let miNombre = localStorage.getItem("chat_user") || "";
 const cont = document.getElementById("msgs");
 const inputTexto = document.getElementById("txt");
-const stickerPanel = document.getElementById("sticker-panel");
 
 // --- LOGICA STICKERS ---
 document.getElementById("btn-sticker-toggle").onclick = () => {
-  stickerPanel.style.display = stickerPanel.style.display === "block" ? "none" : "block";
+  const panel = document.getElementById("sticker-panel");
+  panel.style.display = panel.style.display === "block" ? "none" : "block";
   cont.scrollTop = cont.scrollHeight;
 };
 
-// Crear Sticker
 document.getElementById("add-sticker-btn").onclick = () => document.getElementById("sticker-input").click();
 
 document.getElementById("sticker-input").onchange = (e) => {
@@ -140,61 +128,68 @@ document.getElementById("sticker-input").onchange = (e) => {
   if(!file) return;
   const reader = new FileReader();
   reader.onload = (event) => {
-    const b64 = event.target.result;
-    // Guardar en Globales directamente
-    push(stickersRef, { img: b64, owner: miNombre });
-    // Guardar en Mis Stickers (Local)
-    guardarStickerLocal(b64);
+    push(stickersRef, { img: event.target.result });
   };
   reader.readAsDataURL(file);
 };
 
-function guardarStickerLocal(img) {
-  let mis = JSON.parse(localStorage.getItem("mis_stickers") || "[]");
-  mis.push(img);
-  localStorage.setItem("mis_stickers", JSON.stringify(mis));
-  renderLocalStickers();
-}
-
-function renderLocalStickers() {
-  const grid = document.getElementById("my-stickers");
-  grid.innerHTML = '<div class="btn-add-sticker" id="add-sticker-btn">+</div>';
-  document.getElementById("add-sticker-btn").onclick = () => document.getElementById("sticker-input").click();
-  
-  let mis = JSON.parse(localStorage.getItem("mis_stickers") || "[]");
-  mis.forEach(img => {
-    const el = document.createElement("img");
-    el.src = img;
-    el.className = "sticker-item";
-    el.onclick = () => enviarSticker(img);
-    grid.appendChild(el);
-  });
-}
-
-// Cargar Globales de Firebase
 onChildAdded(stickersRef, (snap) => {
   const s = snap.val();
   const el = document.createElement("img");
   el.src = s.img;
   el.className = "sticker-item";
-  el.onclick = () => enviarSticker(s.img);
+  el.onclick = () => {
+    push(mensajesRef, { user: miNombre, image: s.img, tipo: "sticker" });
+    document.getElementById("sticker-panel").style.display = "none";
+  };
   document.getElementById("global-stickers").appendChild(el);
 });
 
-function enviarSticker(img) {
-  push(mensajesRef, { user: miNombre, image: img, tipo: "sticker" });
-  stickerPanel.style.display = "none";
-}
+// --- ADMIN PANEL (ARREGLADO) ---
+document.getElementById("btn-admin-trigger").onclick = () => {
+  if (sessionStorage.getItem("is_admin") === "true") {
+    document.getElementById("admin-panel").style.display = "block";
+    return;
+  }
+  const code = prompt("Código Admin:");
+  if(code === "1234") {
+    sessionStorage.setItem("is_admin", "true");
+    document.getElementById("admin-panel").style.display = "block";
+    push(mensajesRef, { text: `📢 ¡${miNombre} es Admin! 👑`, tipo: "bot" });
+  }
+};
+document.getElementById("btn-close-admin").onclick = () => document.getElementById("admin-panel").style.display = "none";
+document.getElementById("btn-ban-real").onclick = () => {
+  const u = prompt("Usuario a banear:");
+  if(u) push(mensajesRef, { text: `❌ ${u} ha sido baneado.`, tipo: "bot" });
+};
+document.getElementById("btn-unban-real").onclick = () => {
+  const u = prompt("Usuario a desbanear:");
+  if(u) push(mensajesRef, { text: `✅ ${u} ha sido desbaneado.`, tipo: "bot" });
+};
+document.getElementById("btn-clear").onclick = () => { if(confirm("¿Borrar chat?")) remove(mensajesRef).then(()=>location.reload()); };
 
-// --- LOGICA DE MENSAJES ---
+// --- MENSAJES ---
 onChildAdded(query(mensajesRef, limitToLast(100)), (snap) => {
   const datos = snap.val();
+  if(datos.tipo === "bot" && datos.text.includes(`❌ ${miNombre} ha sido baneado`)) {
+    inputTexto.disabled = true;
+    inputTexto.placeholder = "ESTÁS BANEADO";
+  }
+  if(datos.tipo === "bot" && datos.text.includes(`✅ ${miNombre} ha sido desbaneado`)) {
+    inputTexto.disabled = false;
+    inputTexto.placeholder = "Escribe un mensaje";
+  }
+
   const div = document.createElement("div");
   const esMio = datos.user === miNombre;
   
   if(datos.tipo === "sticker") {
     div.className = "msg sticker-msg " + (esMio ? "mio" : "recibido");
     div.innerHTML = `<b>${datos.user}</b><img src="${datos.image}">`;
+  } else if(datos.tipo === "bot") {
+    div.className = "msg bot-msg";
+    div.innerText = datos.text;
   } else {
     div.className = "msg " + (esMio ? "mio" : "recibido");
     let html = `<b>${datos.user}</b>`;
@@ -206,13 +201,21 @@ onChildAdded(query(mensajesRef, limitToLast(100)), (snap) => {
   cont.scrollTop = cont.scrollHeight;
 });
 
-// --- RESTO DE FUNCIONES (LOGIN, ATTACH, ETC) ---
-document.getElementById("btn-attach").onclick = (e) => {
-  e.stopPropagation();
-  const m = document.getElementById("attach-menu");
-  m.style.display = m.style.display === "block" ? "none" : "block";
+// --- LOGIN Y ENVÍO ---
+document.getElementById("btn-entrar").onclick = async () => {
+  const nom = document.getElementById("user-name").value.trim();
+  const pin = document.getElementById("user-pin").value.trim();
+  if(!nom || pin.length < 4) return;
+  const userRef = ref(db, `usuarios_registrados/${nom}`);
+  const snap = await get(userRef);
+  if(snap.exists() && snap.val().pin !== pin) { alert("PIN INCORRECTO"); return; }
+  if(!snap.exists()) await set(userRef, { pin: pin });
+  miNombre = nom;
+  localStorage.setItem("chat_user", nom);
+  document.getElementById("login-screen").style.display = "none";
 };
-document.getElementById("opt-image").onclick = () => document.getElementById("file-input").click();
+
+document.getElementById("btn-attach").onclick = () => document.getElementById("file-input").click();
 document.getElementById("file-input").onchange = (e) => {
   const reader = new FileReader();
   reader.onload = (ev) => push(mensajesRef, { user: miNombre, image: ev.target.result, tipo: "normal" });
@@ -221,16 +224,12 @@ document.getElementById("file-input").onchange = (e) => {
 
 document.getElementById("btn-send").onclick = () => {
   const t = inputTexto.value.trim();
-  if(t) push(mensajesRef, { user: miNombre, text: t, tipo: "normal" });
+  if(t && !inputTexto.disabled) push(mensajesRef, { user: miNombre, text: t, tipo: "normal" });
   inputTexto.value = "";
 };
 
-// Login basico para que funcione el ejemplo
-document.getElementById("btn-entrar").onclick = () => {
-  const n = document.getElementById("user-name").value;
-  if(n) { miNombre = n; localStorage.setItem("chat_user", n); document.getElementById("login-screen").style.display="none"; }
-};
-if(miNombre) { document.getElementById("login-screen").style.display="none"; renderLocalStickers(); }
+if(miNombre) document.getElementById("login-screen").style.display = "none";
+if(sessionStorage.getItem("is_admin") === "true") document.getElementById("admin-panel").style.display = "block";
 </script>
 </body>
 </html>
