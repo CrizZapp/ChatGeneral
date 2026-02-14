@@ -11,15 +11,15 @@
   .login-card input { width: 90%; padding: 12px; border-radius: 8px; border: none; margin: 15px 0; background: #2a3942; color: white; outline: none; }
   header { background: #202c33; padding: 10px 16px; display: flex; align-items: center; color: #e9edef; justify-content: space-between; }
   
-  /* ADMIN PANEL */
+  /* ADMIN PANEL CORREGIDO */
   #admin-panel { display: none; background: #1f2c33; border-bottom: 2px solid #00a884; padding: 12px; color: white; font-size: 13px; }
   .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
   .admin-btn { padding: 8px; border-radius: 6px; border: none; font-size: 11px; cursor: pointer; font-weight: bold; }
   .btn-danger { background: #ea0038; color: white; }
-  .btn-warn { background: #ffbc00; color: #000; }
   .btn-super { background: #00a884; color: white; }
   .btn-fake { background: #3498db; color: white; }
   .btn-unban { background: #00e676; color: black; }
+  .btn-close { background: #555; color: white; grid-column: span 2; margin-top: 5px; }
 
   #msgs { flex: 1; overflow-y: auto; padding: 20px 10px; display: flex; flex-direction: column; gap: 8px; }
   .msg { padding: 8px 12px; border-radius: 8px; max-width: 75%; color: #e9edef; font-size: 15px; position: relative; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.3); }
@@ -46,8 +46,7 @@
 
   footer { background: #202c33; padding: 10px; display: flex; gap: 10px; }
   #txt { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 25px; color: white; outline: none; }
-  button { background: #00a884; border: none; color: white; cursor: pointer; font-weight: bold; }
-  #btn-send { width: 45px; height: 45px; border-radius: 50%; font-size: 20px; }
+  #btn-send { width: 45px; height: 45px; border-radius: 50%; font-size: 20px; border:none; background:#00a884; color:white; }
 </style>
 </head>
 <body>
@@ -56,16 +55,16 @@
   <div class="login-card">
     <h2 style="color:#00a884">WhatsApp Banda</h2>
     <input type="text" id="user-name" placeholder="Tu apodo...">
-    <button id="btn-entrar" style="padding: 10px 20px; border-radius: 20px; width: 100%;">ENTRAR AL CHAT</button>
+    <button id="btn-entrar" style="padding: 10px 20px; border-radius: 20px; width: 100%; border:none; background:#00a884; color:white;">ENTRAR AL CHAT</button>
   </div>
 </div>
 
 <header>
   <div style="display:flex; align-items:center; gap:10px;">
-    <div id="change-name" style="width:40px; height:40px; background:#6a7175; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;" title="Cambiar nombre">👤</div>
+    <div id="change-name" style="width:40px; height:40px; background:#6a7175; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">👤</div>
     <div style="font-weight:bold;">La Banda 🚀</div>
   </div>
-  <button id="btn-admin-trigger" style="background:transparent; color:#8696a0; font-size: 20px;">⚙️</button>
+  <button id="btn-admin-trigger" style="background:transparent; border:none; color:#8696a0; font-size: 20px;">⚙️</button>
 </header>
 
 <div id="admin-panel">
@@ -74,7 +73,8 @@
     <button id="btn-fake-sys" class="admin-btn btn-fake">🎭 FAKE SYS</button>
     <button id="btn-ban-real" class="admin-btn btn-danger">🚫 BANEAR</button>
     <button id="btn-unban-real" class="admin-btn btn-unban">✅ DESBANEAR</button>
-    <button id="btn-clear" class="admin-btn btn-danger" style="grid-column: span 2;">🗑️ LIMPIAR TODO</button>
+    <button id="btn-clear" class="admin-btn btn-danger">🗑️ BORRAR TODO</button>
+    <button id="btn-close-admin" class="admin-btn btn-close">❌ CERRAR PANEL</button>
   </div>
 </div>
 
@@ -107,43 +107,26 @@ let miNombre = localStorage.getItem("chat_user") || "";
 const cont = document.getElementById("msgs");
 const inputTexto = document.getElementById("txt");
 
-// --- LÓGICA DEL BOT ---
-const botResponde = (texto) => {
-  setTimeout(() => {
-    push(mensajesRef, { user: "🤖 SISTEMA BOT", text: texto, tipo: "bot-neon" });
-  }, 600);
-};
-
-const manejarComandos = (cmd) => {
-  const texto = cmd.toLowerCase();
-  if (texto === "/help") {
-    botResponde("🌸 Comandos: /help, /start, /infobot, /hola 🌸");
-  } else if (texto === "/start") {
-    botResponde(`¡Hola ${miNombre}! Bot activado.`);
-  } else if (texto === "/hola") {
-    botResponde("¡Hola! ¿Cómo va todo? 😊");
-  } else if (texto.startsWith("/")) {
-    botResponde(`Comando desconocido: ${cmd}`);
+// --- PERSISTENCIA DE ADMIN ---
+const checkAdminStatus = () => {
+  if (sessionStorage.getItem("is_admin") === "true") {
+    document.getElementById("admin-panel").style.display = "block";
+    inputTexto.disabled = false;
+    inputTexto.placeholder = "Escribe un mensaje";
   }
 };
 
 const agregarMensajePantalla = (datos) => {
-  // Lógica de Ban: Bloquear si hay mensaje de baneo
   if(datos.tipo === "bot" && datos.text.includes(`❌ ${miNombre} ha sido baneado`)) {
     inputTexto.disabled = true;
     inputTexto.placeholder = "ESTÁS BANEADO";
-    inputTexto.value = "Baneado por el Admin";
   }
-  
-  // Lógica de Desban: Desbloquear si hay mensaje de perdón
   if(datos.tipo === "bot" && datos.text.includes(`✅ ${miNombre} ha sido desbaneado`)) {
     inputTexto.disabled = false;
     inputTexto.placeholder = "Escribe un mensaje";
-    inputTexto.value = "";
   }
 
   const div = document.createElement("div");
-  
   if(datos.tipo === "bot") {
     div.className = "msg bot-msg";
     div.innerText = datos.text;
@@ -162,85 +145,89 @@ const agregarMensajePantalla = (datos) => {
   cont.scrollTop = cont.scrollHeight;
 };
 
-const consulta = query(mensajesRef, limitToLast(100));
-onChildAdded(consulta, (snap) => {
+onChildAdded(query(mensajesRef, limitToLast(100)), (snap) => {
   agregarMensajePantalla(snap.val());
 });
 
-if(miNombre) {
-    document.getElementById("login-screen").style.display = "none";
-}
+if(miNombre) document.getElementById("login-screen").style.display = "none";
 
 document.getElementById("btn-entrar").onclick = () => {
   const nom = document.getElementById("user-name").value.trim();
   if(nom) {
     miNombre = nom;
     localStorage.setItem("chat_user", nom);
-    document.getElementById("login-screen").style.display = "none";
     location.reload(); 
   }
 };
 
-// --- CAMBIAR NOMBRE ---
 document.getElementById("change-name").onclick = () => {
-  const nuevoNom = prompt("Introduce tu nuevo apodo:", miNombre);
-  if(nuevoNom && nuevoNom.trim() !== "") {
-    miNombre = nuevoNom.trim();
-    localStorage.setItem("chat_user", miNombre);
-    alert("Nombre actualizado");
+  const nuevo = prompt("Nuevo apodo:", miNombre);
+  if(nuevo) {
+    localStorage.setItem("chat_user", nuevo.trim());
     location.reload();
   }
 };
 
 const enviar = () => {
-  const msgRaw = inputTexto.value.trim();
-  if(!msgRaw || !miNombre || inputTexto.disabled) return;
-
-  push(mensajesRef, { user: miNombre, text: msgRaw, tipo: "normal" });
-  if(msgRaw.startsWith("/")) manejarComandos(msgRaw);
+  const msg = inputTexto.value.trim();
+  if(!msg || !miNombre || inputTexto.disabled) return;
+  push(mensajesRef, { user: miNombre, text: msg, tipo: "normal" });
+  if(msg.startsWith("/")) {
+    if(msg === "/help") push(mensajesRef, { user: "🤖 BOT", text: "Comandos: /help, /start, /hola", tipo: "bot-neon" });
+    if(msg === "/hola") push(mensajesRef, { user: "🤖 BOT", text: "¡Hola! ¿Cómo estás?", tipo: "bot-neon" });
+  }
   inputTexto.value = "";
 };
 
 document.getElementById("btn-send").onclick = enviar;
 inputTexto.onkeypress = (e) => { if(e.key === "Enter") enviar(); };
 
-// --- ACCIONES ADMIN ---
+// --- LOGICA ADMIN MEJORADA ---
 document.getElementById("btn-admin-trigger").onclick = () => {
+  if (sessionStorage.getItem("is_admin") === "true") {
+    document.getElementById("admin-panel").style.display = "block";
+    return;
+  }
   const code = prompt("Código Admin:");
   if(code === "1234") {
-    // EMERGENCIA: Si el admin entra con el código, se desbanea a sí mismo automáticamente
+    sessionStorage.setItem("is_admin", "true");
+    document.getElementById("admin-panel").style.display = "block";
+    push(mensajesRef, { text: `📢 ¡${miNombre} ha entrado al modo Admin! 👑`, tipo: "bot" });
     inputTexto.disabled = false;
     inputTexto.placeholder = "Escribe un mensaje";
-    inputTexto.value = "";
-    
-    document.getElementById("admin-panel").style.display = "block";
-    push(mensajesRef, { text: `📢 ¡${miNombre} ahora es Admin! 👑`, tipo: "bot" });
   }
 };
 
+document.getElementById("btn-close-admin").onclick = () => {
+  document.getElementById("admin-panel").style.display = "none";
+  // Opcional: sessionStorage.removeItem("is_admin"); // Si quieres que pida código siempre
+};
+
 document.getElementById("btn-ban-real").onclick = () => {
-  const user = prompt("¿Nombre exacto del usuario a banear?");
-  if(user) push(mensajesRef, { text: `❌ ${user} ha sido baneado permanentemente.`, tipo: "bot" });
+  const u = prompt("Usuario a banear:");
+  if(u) push(mensajesRef, { text: `❌ ${u} ha sido baneado.`, tipo: "bot" });
 };
 
 document.getElementById("btn-unban-real").onclick = () => {
-  const user = prompt("¿Nombre del usuario a desbanear?");
-  if(user) push(mensajesRef, { text: `✅ ${user} ha sido desbaneado por el Admin.`, tipo: "bot" });
+  const u = prompt("Usuario a desbanear:");
+  if(u) push(mensajesRef, { text: `✅ ${u} ha sido desbaneado.`, tipo: "bot" });
 };
 
 document.getElementById("btn-fake-sys").onclick = () => {
-  const fakeMsg = prompt("Escribe el mensaje falso del sistema:");
-  if(fakeMsg) push(mensajesRef, { text: fakeMsg, tipo: "bot" });
+  const f = prompt("Mensaje de sistema:");
+  if(f) push(mensajesRef, { text: f, tipo: "bot" });
 };
 
 document.getElementById("btn-super").onclick = () => {
-  const msg = prompt("Mensaje SuperChat:");
-  if(msg) push(mensajesRef, { user: `⭐ ${miNombre}`, text: msg.toUpperCase(), tipo: "superchat" });
+  const m = prompt("Mensaje SuperChat:");
+  if(m) push(mensajesRef, { user: `⭐ ${miNombre}`, text: m.toUpperCase(), tipo: "superchat" });
 };
 
 document.getElementById("btn-clear").onclick = () => {
   if(confirm("¿Borrar todo?")) remove(mensajesRef).then(() => location.reload());
 };
+
+checkAdminStatus();
 </script>
 </body>
 </html>
