@@ -2,44 +2,47 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WhatsApp Banda Final 🚀</title>
 <style>
-  * { box-sizing: border-box; }
   body { margin: 0; font-family: sans-serif; background-color: #0b141a; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+  #login-screen { position: fixed; inset: 0; background: #111b21; display: flex; align-items: center; justify-content: center; z-index: 1000; }
+  .login-card { background: #202c33; padding: 30px; border-radius: 15px; text-align: center; color: white; width: 80%; max-width: 300px; border: 1px solid #00a884; }
+  .login-card input { width: 90%; padding: 12px; border-radius: 8px; border: none; margin: 10px 0; background: #2a3942; color: white; outline: none; text-align: center; }
+  header { background: #202c33; padding: 10px 16px; display: flex; align-items: center; color: #e9edef; justify-content: space-between; flex-shrink: 0; }
   
-  header { background: #202c33; padding: 10px 16px; display: flex; align-items: center; color: #e9edef; justify-content: space-between; z-index: 10; }
-  
-  #admin-panel { display: none; background: #1f2c33; border-bottom: 2px solid #00a884; padding: 12px; color: white; font-size: 13px; z-index: 9; }
+  #admin-panel { display: none; background: #1f2c33; border-bottom: 2px solid #00a884; padding: 12px; color: white; font-size: 13px; }
   .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
   .admin-btn { padding: 8px; border-radius: 6px; border: none; font-size: 11px; cursor: pointer; font-weight: bold; }
   .btn-danger { background: #ea0038; color: white; }
-  .btn-super { background: #ffbc00; color: black; }
+  .btn-super { background: #00a884; color: white; }
   .btn-fake { background: #3498db; color: white; }
+  .btn-unban { background: #00e676; color: black; }
   .btn-close { background: #555; color: white; grid-column: span 2; margin-top: 5px; }
 
-  #msgs { flex: 1; overflow-y: auto; padding: 20px 10px; display: flex; flex-direction: column; gap: 8px; padding-bottom: 20px; }
+  /* Estilos del Panel de Stickers */
+  #sticker-panel { display: none; background: #0b141a; height: 250px; overflow-y: auto; padding: 10px; border-top: 1px solid #202c33; flex-shrink: 0; }
+  .sticker-section-title { color: #00a884; font-size: 12px; font-weight: bold; padding: 10px 0; border-bottom: 1px solid #233138; margin-bottom: 10px; display: flex; justify-content: space-between; }
+  .sticker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .sticker-item { width: 100%; aspect-ratio: 1/1; object-fit: contain; background: #111b21; border-radius: 4px; cursor: pointer; }
+  .sticker-msg { background: transparent !important; box-shadow: none !important; padding: 0 !important; }
+  .sticker-msg img { width: 130px; height: 130px; object-fit: contain; }
+
+  #msgs { flex: 1; overflow-y: auto; padding: 20px 10px; display: flex; flex-direction: column; gap: 8px; }
   .msg { padding: 8px 12px; border-radius: 8px; max-width: 75%; color: #e9edef; font-size: 15px; position: relative; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.3); }
   .msg b { display: block; font-size: 12px; margin-bottom: 3px; color: #ffd07a; }
   .recibido { background: #202c33; align-self: flex-start; border-top-left-radius: 0; }
   .mio { background: #005c4b; align-self: flex-end; border-top-right-radius: 0; }
-  
   .bot-msg { background: #1c3d5a; border: 1px solid #3498db; align-self: center; text-align: center; max-width: 90%; border-radius: 15px; color: #3498db; padding: 5px 15px; font-weight: bold; margin: 5px 0; font-size: 13px; }
-  .superchat-msg { background: linear-gradient(135deg, #ffbc00, #ff8c00) !important; color: #000 !important; align-self: center !important; text-align: center; border: 2px solid #fff; font-weight: bold; width: 85%; }
-  .sticker-msg { background: transparent !important; box-shadow: none !important; padding: 0 !important; }
-  .sticker-msg img { width: 130px; height: 130px; object-fit: contain; }
+  .superchat-msg { background: linear-gradient(135deg, #ffbc00, #ff8c00) !important; color: #000 !important; align-self: center !important; text-align: center; border: 2px solid #fff; font-weight: bold; }
   .msg img { max-width: 100%; border-radius: 8px; margin-top: 5px; display: block; }
 
-  footer { background: #202c33; padding: 10px; display: flex; gap: 10px; align-items: center; z-index: 10; }
-  #txt { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 25px; color: white; outline: none; font-size: 16px; }
-  #btn-send { width: 45px; height: 45px; border-radius: 50%; border:none; background:#00a884; color:white; cursor:pointer; font-size: 20px; }
+  footer { background: #202c33; padding: 10px; display: flex; gap: 10px; align-items: center; position: relative; flex-shrink: 0; }
+  #txt { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 25px; color: white; outline: none; }
+  #btn-send { width: 45px; height: 45px; border-radius: 50%; font-size: 20px; border:none; background:#00a884; color:white; cursor:pointer; }
   
-  #sticker-panel { display: none; background: #0b141a; height: 250px; border-top: 1px solid #202c33; overflow-y: auto; padding: 10px; }
-  .sticker-title { color: #00a884; font-size: 11px; font-weight: bold; margin: 10px 0 5px 0; border-bottom: 1px solid #233138; padding-bottom: 3px; }
-  .sticker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-  .sticker-item { width: 100%; aspect-ratio: 1/1; cursor: pointer; object-fit: contain; background: #111b21; border-radius: 5px; }
-
-  #login-screen { position: fixed; inset: 0; background: #111b21; display: flex; align-items: center; justify-content: center; z-index: 100; }
+  #attach-menu { display: none; position: absolute; bottom: 70px; left: 10px; background: #233138; border-radius: 12px; padding: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 200; }
+  .attach-option { color: white; padding: 8px 15px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 14px; }
 </style>
 </head>
 <body>
@@ -47,9 +50,10 @@
 <div id="login-screen">
   <div class="login-card">
     <h2 style="color:#00a884">WhatsApp Banda</h2>
+    <p id="login-info" style="font-size: 11px; color: #8696a0;">Usa tu PIN de 4 dígitos.</p>
     <input type="text" id="user-name" placeholder="Tu apodo...">
     <input type="password" id="user-pin" placeholder="PIN" maxlength="4">
-    <button id="btn-entrar" style="padding: 10px 20px; border-radius: 20px; width: 100%; border:none; background:#00a884; color:white; cursor:pointer; font-weight:bold; margin-top:10px;">ENTRAR</button>
+    <button id="btn-entrar" style="padding: 10px 20px; border-radius: 20px; width: 100%; border:none; background:#00a884; color:white; cursor:pointer; font-weight:bold;">ENTRAR</button>
   </div>
 </div>
 
@@ -66,33 +70,36 @@
     <button id="btn-super" class="admin-btn btn-super">🌟 SUPERCHAT</button>
     <button id="btn-fake-sys" class="admin-btn btn-fake">🎭 FAKE SYS</button>
     <button id="btn-ban-real" class="admin-btn btn-danger">🚫 BANEAR</button>
-    <button id="btn-unban-real" class="admin-btn btn-danger" style="background:#00e676; color:black;">✅ DESBANEAR</button>
-    <button id="btn-clear" class="admin-btn btn-danger">🗑️ BORRAR CHAT</button>
+    <button id="btn-unban-real" class="admin-btn btn-unban">✅ DESBANEAR</button>
+    <button id="btn-clear" class="admin-btn btn-danger">🗑️ BORRAR TODO</button>
     <button id="btn-close-admin" class="admin-btn btn-close">❌ CERRAR PANEL</button>
   </div>
 </div>
 
 <div id="msgs"></div>
 
+<div id="attach-menu">
+  <div class="attach-option" id="opt-image">🖼️ Imagen</div>
+</div>
+
 <footer>
-  <input type="file" id="file-input" accept="image/*" style="display: none;">
-  <input type="file" id="sticker-input" accept="image/*" style="display: none;">
-  <button id="btn-attach" style="background:transparent; border:none; color:#8696a0; font-size: 28px; cursor:pointer;">+</button>
   <button id="btn-sticker-toggle" style="background:transparent; border:none; color:#8696a0; font-size: 24px; cursor:pointer;">✪</button>
+  <button id="btn-attach" style="background:transparent; border:none; color:#8696a0; font-size: 30px; cursor:pointer;">+</button>
   <input id="txt" placeholder="Escribe un mensaje" autocomplete="off">
   <button id="btn-send">➤</button>
 </footer>
 
 <div id="sticker-panel">
-  <div style="display:flex; justify-content: space-between; align-items: center;">
-    <span style="color:#00a884; font-size: 13px; font-weight: bold;">STICKERS</span>
-    <button id="add-sticker-btn" style="background:#00a884; border:none; color:white; border-radius:5px; padding: 4px 12px; cursor:pointer; font-size: 11px;">+ CREAR</button>
+  <div class="sticker-section-title">
+    MIS STICKERS <button id="add-sticker-btn" style="background:#00a884; color:white; border:none; border-radius:4px; padding:2px 8px; cursor:pointer;">+</button>
   </div>
-  <div class="sticker-title">MIS STICKERS</div>
   <div class="sticker-grid" id="my-stickers"></div>
-  <div class="sticker-title">GLOBALES</div>
+  <div class="sticker-section-title">GLOBALES</div>
   <div class="sticker-grid" id="global-stickers"></div>
 </div>
+
+<input type="file" id="file-input" accept="image/*" style="display: none;">
+<input type="file" id="sticker-input" accept="image/*" style="display:none;">
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -116,39 +123,37 @@ const stickersRef = ref(db, "stickers_v2");
 let miNombre = localStorage.getItem("chat_user") || "";
 const cont = document.getElementById("msgs");
 const inputTexto = document.getElementById("txt");
-const stickerPanel = document.getElementById("sticker-panel");
 
 // --- STICKERS ---
 document.getElementById("btn-sticker-toggle").onclick = () => {
-  stickerPanel.style.display = stickerPanel.style.display === "block" ? "none" : "block";
+  const sp = document.getElementById("sticker-panel");
+  sp.style.display = sp.style.display === "block" ? "none" : "block";
   cont.scrollTop = cont.scrollHeight;
 };
 
 document.getElementById("add-sticker-btn").onclick = () => document.getElementById("sticker-input").click();
 
 document.getElementById("sticker-input").onchange = (e) => {
-  const file = e.target.files[0];
-  if(!file) return;
   const reader = new FileReader();
-  reader.onload = (event) => {
-    const b64 = event.target.result;
+  reader.onload = (ev) => {
+    const b64 = ev.target.result;
     push(stickersRef, { img: b64 });
-    let local = JSON.parse(localStorage.getItem("mis_stickers_v2") || "[]");
+    let local = JSON.parse(localStorage.getItem("mis_stickers") || "[]");
     local.push(b64);
-    localStorage.setItem("mis_stickers_v2", JSON.stringify(local));
+    localStorage.setItem("mis_stickers", JSON.stringify(local));
     renderMisStickers();
   };
-  reader.readAsDataURL(file);
+  reader.readAsDataURL(e.target.files[0]);
 };
 
 function renderMisStickers() {
   const grid = document.getElementById("my-stickers");
   grid.innerHTML = "";
-  let local = JSON.parse(localStorage.getItem("mis_stickers_v2") || "[]");
+  let local = JSON.parse(localStorage.getItem("mis_stickers") || "[]");
   local.forEach(img => {
     const el = document.createElement("img");
     el.src = img; el.className = "sticker-item";
-    el.onclick = () => enviarSticker(img);
+    el.onclick = () => { push(mensajesRef, { user: miNombre, image: img, tipo: "sticker" }); document.getElementById("sticker-panel").style.display = "none"; };
     grid.appendChild(el);
   });
 }
@@ -157,74 +162,37 @@ onChildAdded(stickersRef, (snap) => {
   const s = snap.val();
   const el = document.createElement("img");
   el.src = s.img; el.className = "sticker-item";
-  el.onclick = () => enviarSticker(s.img);
+  el.onclick = () => { push(mensajesRef, { user: miNombre, image: s.img, tipo: "sticker" }); document.getElementById("sticker-panel").style.display = "none"; };
   document.getElementById("global-stickers").appendChild(el);
 });
 
-function enviarSticker(img) {
-  push(mensajesRef, { user: miNombre, image: img, tipo: "sticker" });
-  stickerPanel.style.display = "none";
-}
-
-// --- ADMIN ---
-document.getElementById("btn-admin-trigger").onclick = () => {
-  if (sessionStorage.getItem("is_admin") === "true") {
-    document.getElementById("admin-panel").style.display = "block";
-    return;
-  }
-  const code = prompt("Código Admin:");
-  if(code === "CrizZapp13") {
-    sessionStorage.setItem("is_admin", "true");
-    document.getElementById("admin-panel").style.display = "block";
-    push(mensajesRef, { text: `📢 ¡${miNombre} es Admin! 👑`, tipo: "bot" });
-  }
+// --- LOGIN ---
+document.getElementById("btn-entrar").onclick = async () => {
+  const nom = document.getElementById("user-name").value.trim();
+  const pin = document.getElementById("user-pin").value.trim();
+  if(!nom || pin.length < 4) return;
+  const userRef = ref(db, `usuarios_registrados/${nom}`);
+  const snap = await get(userRef);
+  if(snap.exists() && snap.val().pin !== pin) { alert("PIN INCORRECTO"); return; }
+  if(!snap.exists()) await set(userRef, { pin: pin });
+  miNombre = nom; localStorage.setItem("chat_user", nom);
+  document.getElementById("login-screen").style.display = "none";
+  renderMisStickers();
 };
-
-document.getElementById("btn-super").onclick = () => {
-  const m = prompt("Mensaje SuperChat:");
-  if(m) push(mensajesRef, { user: `⭐ ${miNombre}`, text: m.toUpperCase(), tipo: "superchat" });
-};
-
-document.getElementById("btn-fake-sys").onclick = () => {
-  const f = prompt("Mensaje de sistema:");
-  if(f) push(mensajesRef, { text: f, tipo: "bot" });
-};
-
-document.getElementById("btn-ban-real").onclick = () => {
-  const u = prompt("Usuario a banear:");
-  if(u) push(mensajesRef, { text: `❌ ${u} ha sido baneado.`, tipo: "bot" });
-};
-
-document.getElementById("btn-unban-real").onclick = () => {
-  const u = prompt("Usuario a desbanear:");
-  if(u) push(mensajesRef, { text: `✅ ${u} ha sido desbaneado.`, tipo: "bot" });
-};
-
-document.getElementById("btn-clear").onclick = () => { if(confirm("¿Borrar chat?")) remove(mensajesRef).then(()=>location.reload()); };
-document.getElementById("btn-close-admin").onclick = () => document.getElementById("admin-panel").style.display = "none";
 
 // --- MENSAJES ---
 onChildAdded(query(mensajesRef, limitToLast(100)), (snap) => {
   const datos = snap.val();
-  if(datos.tipo === "bot" && datos.text && datos.text.includes(`❌ ${miNombre} ha sido baneado`)) {
-    inputTexto.disabled = true; inputTexto.placeholder = "BANEADO";
-  }
-  if(datos.tipo === "bot" && datos.text && datos.text.includes(`✅ ${miNombre} ha sido desbaneado`)) {
-    inputTexto.disabled = false; inputTexto.placeholder = "Escribe un mensaje";
-  }
-
   const div = document.createElement("div");
   const esMio = datos.user === miNombre;
-  
+
   if(datos.tipo === "sticker") {
     div.className = "msg sticker-msg " + (esMio ? "mio" : "recibido");
     div.innerHTML = `<b>${datos.user}</b><img src="${datos.image}">`;
-  } else if(datos.tipo === "superchat") {
-    div.className = "msg superchat-msg";
-    div.innerHTML = `<b>${datos.user}</b>${datos.text}`;
   } else if(datos.tipo === "bot") {
-    div.className = "msg bot-msg";
-    div.innerText = datos.text;
+    div.className = "msg bot-msg"; div.innerText = datos.text;
+  } else if(datos.tipo === "superchat") {
+    div.className = "msg superchat-msg"; div.innerHTML = `<b>${datos.user}</b><br>${datos.text}`;
   } else {
     div.className = "msg " + (esMio ? "mio" : "recibido");
     let h = `<b>${datos.user}</b>`;
@@ -236,40 +204,27 @@ onChildAdded(query(mensajesRef, limitToLast(100)), (snap) => {
   cont.scrollTop = cont.scrollHeight;
 });
 
-// --- LOGIN & ENVIO ---
-document.getElementById("btn-entrar").onclick = async () => {
-  const nom = document.getElementById("user-name").value.trim();
-  const pin = document.getElementById("user-pin").value.trim();
-  if(!nom || pin.length < 4) return;
-  const userRef = ref(db, `usuarios_registrados/${nom}`);
-  const snap = await get(userRef);
-  if(snap.exists() && snap.val().pin !== pin) { alert("PIN MAL"); return; }
-  if(!snap.exists()) await set(userRef, { pin: pin });
-  miNombre = nom; localStorage.setItem("chat_user", nom);
-  document.getElementById("login-screen").style.display = "none";
-  renderMisStickers();
+document.getElementById("btn-send").onclick = () => {
+  const m = inputTexto.value.trim();
+  if(m) { push(mensajesRef, { user: miNombre, text: m, tipo: "normal" }); inputTexto.value = ""; }
 };
 
-document.getElementById("btn-attach").onclick = () => document.getElementById("file-input").click();
+document.getElementById("btn-attach").onclick = () => document.getElementById("attach-menu").style.display = "block";
+document.getElementById("opt-image").onclick = () => { document.getElementById("file-input").click(); document.getElementById("attach-menu").style.display = "none"; };
 document.getElementById("file-input").onchange = (e) => {
   const r = new FileReader();
   r.onload = (ev) => push(mensajesRef, { user: miNombre, image: ev.target.result, tipo: "normal" });
   r.readAsDataURL(e.target.files[0]);
 };
 
-const enviar = () => {
-  const t = inputTexto.value.trim();
-  if(t && !inputTexto.disabled) push(mensajesRef, { user: miNombre, text: t, tipo: "normal" });
-  inputTexto.value = "";
-};
-document.getElementById("btn-send").onclick = enviar;
-inputTexto.onkeypress = (e) => { if(e.key === "Enter") enviar(); };
+// --- ADMIN ---
+document.getElementById("btn-admin-trigger").onclick = () => { if(prompt("CrizZapp Code:") === "CrizZapPro") document.getElementById("admin-panel").style.display = "block"; };
+document.getElementById("btn-close-admin").onclick = () => document.getElementById("admin-panel").style.display = "none";
+document.getElementById("btn-clear").onclick = () => { if(confirm("¿Borrar todo?")) remove(mensajesRef).then(()=>location.reload()); };
+document.getElementById("btn-super").onclick = () => { const m = prompt("SuperChat:"); if(m) push(mensajesRef, { user: miNombre, text: m.toUpperCase(), tipo: "superchat" }); };
+document.getElementById("btn-fake-sys").onclick = () => { const f = prompt("Sistema:"); if(f) push(mensajesRef, { text: f, tipo: "bot" }); };
 
-if(miNombre) {
-  document.getElementById("login-screen").style.display = "none";
-  renderMisStickers();
-}
-if(sessionStorage.getItem("is_admin") === "true") document.getElementById("admin-panel").style.display = "block";
+if(miNombre) { document.getElementById("login-screen").style.display = "none"; renderMisStickers(); }
 </script>
 </body>
 </html>
